@@ -123,5 +123,13 @@ namespace CodeFirstDemo.Controllers
             }
             base.Dispose(disposing);
         }
+
+        [HttpPost]
+        public JsonResult GetCustomers(string filterCustomer)
+        {
+            var customers = db.Customers.Where(x => x.Name.Contains(filterCustomer) || x.LastName.Contains(filterCustomer) || x.Dni.Contains(filterCustomer) ).ToList();
+            return Json(customers, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

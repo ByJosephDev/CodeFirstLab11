@@ -36,35 +36,121 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Dni)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Address)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.City)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Mail)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Phone)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.CustomerID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.CustomerID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.CustomerID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dni)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.City)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mail)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Phone)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.CustomerID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.CustomerID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.CustomerID })
+            </td>
+        </tr>
+    }
 
 </table>
+
+<div class="mt-5">
+    <h3>Busqueda dinamica por nombre, apellido o dni de cliente </h3>
+    <input class="form-control" value="" id="filterCustomer" name="filterCustomer" type="text" />
+</div>
+<br />
+<br />
+<div class="mt-5">
+    <table id="tableCustomers" class="table">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    FullName
+                </th>
+                <th>
+                    DNI
+                </th>
+                <th>
+                    Address - City
+                </th>
+                <th>
+                    Mail
+                </th>
+                <th>
+                    Phone
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#filterCustomer').keyup(function () {
+
+                var filterCustomer = $('#filterCustomer').val();
+
+                if (filterCustomer === '') {
+                    return $('#tableCustomers tbody tr').remove();
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetCustomers")',
+                    dataType: 'json',
+                    data: { filterCustomer: filterCustomer },
+                    success: function (data) {
+                        $('#tableCustomers tbody tr').remove();
+                        $.each(data, function (i, item) {
+                            var rows = "<tr>"
+                                + "<th scope='row'>" + item.CustomerID + "</th>"
+                                + "<td>" + item.Name + " " + item.LastName + "</td>"
+                                + "<td>" + item.Dni + "</td>"
+                                + "<td>" + item.Address + " " + item.City + "</td>"
+                                + "<td>" + item.Mail + "</td>"
+                                + "<td>" + item.Phone + "</td>"
+                            "</tr>"
+                            $('#tableCustomers tbody').append(rows);
+                        });
+                    },
+                    error: function (ex) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        console.log('Message: ' + r.Message);
+                        console.log('StackTrace: ' + r.StackTrace);
+                        console.log('ExceptionType: ' + r.ExceptionType);
+                    }
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+}

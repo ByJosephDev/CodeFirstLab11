@@ -128,5 +128,21 @@ namespace CodeFirstDemo.Controllers
             }
             base.Dispose(disposing);
         }
+
+        [HttpPost]
+        public JsonResult GetProducts(string name)
+        {
+            var products = db.Products.Where(x => x.Name.Contains(name)).Join(db.Sellers, p => p.SellerID, s => s.SellerID, (p, s) => new {
+                p.ProductID,
+                p.Name,
+                p.Price,
+                seller_name = s.Name,
+                seller_lastname = s.LastName,
+                seller_ruc = s.Ruc,
+                seller_phone = s.Phone,
+            }).ToList();
+            return Json(products, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

@@ -10,7 +10,7 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
+<table class="table mb-3">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Seller.Name)
@@ -44,3 +44,89 @@
 }
 
 </table>
+
+<div class="mt-5">
+    <h3>Busqueda dinamica por nombre de producto </h3>
+    <input class="form-control" value="" id="nameProduct" name="nameProduct" type="text"  />
+</div>
+<br />
+<br />
+<div class="mt-5">
+    <table id="tableProducts" class="table">
+        <thead>
+            <tr>
+                <th>
+                    ID - Product
+                </th>
+                <th>
+                    Name - Product
+                </th>
+                <th>
+                    Price - Product
+                </th>
+                <th>
+                    FullName - Seller
+                </th>
+                <th>
+                    Phone - Seller
+                </th>
+                <th>
+                    RUC - Seller
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#nameProduct').keyup(function () {
+
+                var nameProduct = $('#nameProduct').val();
+
+                if (nameProduct === '') {
+                    return $('#tableProducts tbody tr').remove();
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetProducts")',
+                    dataType: 'json',
+                    data: { name: nameProduct },
+                    success: function (data) {
+                        $('#tableProducts tbody tr').remove();
+                        $.each(data, function (i, item) {
+                            var rows = "<tr>"
+                                + "<th scope='row'>" + item.ProductID + "</th>"
+                                + "<td>" + item.Name + "</td>"
+                                + "<td>" + item.Price + "</td>"
+                                + "<td>" + item.seller_name + " " + item.seller_lastname + "</td>"
+                                + "<td>" + item.seller_phone + "</td>"
+                                + "<td>" + item.seller_ruc + "</td>"
+                            "</tr>"
+                            $('#tableProducts tbody').append(rows);
+                        });
+                    },
+                    error: function (ex) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        console.log('Message: ' + r.Message);
+                        console.log('StackTrace: ' + r.StackTrace);
+                        console.log('ExceptionType: ' + r.ExceptionType);
+                    }
+
+                });
+
+            });
+
+        });
+
+    </script>
+    
+}
